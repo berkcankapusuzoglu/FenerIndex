@@ -16,13 +16,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FenerIndex - Fenerbahce Fan Sentiment Platform",
+  title: {
+    default: "FenerIndex - The Pulse of Fenerbahce Fans",
+    template: "%s | FenerIndex",
+  },
   description:
-    "Vote on transfer rumors, rate players, and share your Fenerbahce opinions with the world.",
+    "Fan-powered transfer intelligence for Fenerbahce. Vote on rumors, call cap on fake news, and see what the hive mind really thinks.",
+  keywords: [
+    "Fenerbahce",
+    "transfer rumors",
+    "fan voting",
+    "Super Lig",
+    "football",
+    "soccer",
+    "sentiment",
+  ],
   openGraph: {
-    title: "FenerIndex",
-    description: "The pulse of Fenerbahce fans",
+    title: "FenerIndex - The Pulse of Fenerbahce Fans",
+    description:
+      "Fan-powered transfer intelligence. Vote on rumors, expose fakes, shape the narrative.",
     type: "website",
+    siteName: "FenerIndex",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FenerIndex - The Pulse of Fenerbahce Fans",
+    description:
+      "Fan-powered transfer intelligence. Vote on rumors, expose fakes, shape the narrative.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

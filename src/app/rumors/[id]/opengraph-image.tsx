@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { renderShareCard } from "@/lib/share-card-renderer";
+import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
+import type { Rumor } from "@/lib/supabase/types";
 
 export const runtime = "nodejs";
 export const alt = "FenerIndex Rumor";
@@ -13,12 +14,21 @@ export default async function OGImage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await getSupabaseServerClient();
-  const { data: rumor } = await supabase
-    .from("rumors")
-    .select("*")
-    .eq("id", id)
-    .single();
+
+  let rumor: Rumor | null = null;
+
+  if (isDemoMode()) {
+    rumor = DEMO_RUMORS.find((r) => r.id === id) ?? null;
+  } else {
+    const { getSupabaseServerClient } = await import("@/lib/supabase/server");
+    const supabase = await getSupabaseServerClient();
+    const { data } = await supabase
+      .from("rumors")
+      .select("*")
+      .eq("id", id)
+      .single();
+    rumor = data as Rumor | null;
+  }
 
   if (!rumor) {
     return new ImageResponse(

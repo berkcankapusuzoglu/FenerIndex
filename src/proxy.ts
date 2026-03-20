@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 
 export function proxy(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+
+  // Skip Supabase auth refresh in demo mode
+  if (!supabaseUrl || supabaseUrl.includes("placeholder") || supabaseUrl.startsWith("<")) {
+    return NextResponse.next({ request });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { createServerClient } = require("@supabase/ssr");
+
   let supabaseResponse = NextResponse.next({ request });
 
   createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );

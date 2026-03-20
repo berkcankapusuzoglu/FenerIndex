@@ -1,19 +1,28 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { RumorList } from "@/components/rumors/rumor-list";
+import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
+import type { Rumor } from "@/lib/supabase/types";
 
 export const metadata = {
   title: "Rumor Radar | FenerIndex",
   description: "Vote on the latest Fenerbahce transfer rumors",
 };
 
-export default async function RumorsPage() {
-  const supabase = await getSupabaseServerClient();
+async function getRumors(): Promise<Rumor[]> {
+  if (isDemoMode()) return DEMO_RUMORS;
 
-  const { data: rumors } = await supabase
+  const { getSupabaseServerClient } = await import("@/lib/supabase/server");
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
     .from("rumors")
     .select("*")
     .eq("status", "active")
     .order("created_at", { ascending: false });
+
+  return (data as Rumor[]) ?? [];
+}
+
+export default async function RumorsPage() {
+  const rumors = await getRumors();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -25,7 +34,7 @@ export default async function RumorsPage() {
           Do you believe it or is it cap? Cast your vote.
         </p>
       </div>
-      <RumorList initialRumors={rumors ?? []} />
+      <RumorList initialRumors={rumors} />
     </div>
   );
 }

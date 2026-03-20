@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { RumorCard } from "@/components/rumors/rumor-card";
 import { ShareButton } from "@/components/rumors/share-button";
+import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
 import type { Rumor } from "@/lib/supabase/types";
 
 interface Props {
@@ -9,6 +9,11 @@ interface Props {
 }
 
 async function getRumor(id: string): Promise<Rumor | null> {
+  if (isDemoMode()) {
+    return DEMO_RUMORS.find((r) => r.id === id) ?? null;
+  }
+
+  const { getSupabaseServerClient } = await import("@/lib/supabase/server");
   const supabase = await getSupabaseServerClient();
   const { data } = await supabase
     .from("rumors")

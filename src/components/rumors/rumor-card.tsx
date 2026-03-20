@@ -1,12 +1,11 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SentimentGauge } from "./sentiment-gauge";
-import { castVote } from "@/app/rumors/actions";
 import type { Rumor, VoteType } from "@/lib/supabase/types";
 
 interface RumorCardProps {
@@ -14,67 +13,56 @@ interface RumorCardProps {
   expanded?: boolean;
 }
 
-type OptimisticState = {
-  believe_count: number;
-  cap_count: number;
-  userVote: VoteType | null;
-};
-
 export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
-  const [isPending, startTransition] = useTransition();
-  const [optimistic, setOptimistic] = useOptimistic<OptimisticState, VoteType>(
-    {
-      believe_count: rumor.believe_count,
-      cap_count: rumor.cap_count,
-      userVote: null,
-    },
-    (state, voteType) => {
-      if (state.userVote === voteType) {
-        // Toggle off
-        return {
-          believe_count:
-            voteType === "believe"
-              ? Math.max(state.believe_count - 1, 0)
-              : state.believe_count,
-          cap_count:
-            voteType === "cap"
-              ? Math.max(state.cap_count - 1, 0)
-              : state.cap_count,
-          userVote: null,
-        };
-      } else if (state.userVote) {
-        // Switch
-        return {
-          believe_count:
-            voteType === "believe"
-              ? state.believe_count + 1
-              : Math.max(state.believe_count - 1, 0),
-          cap_count:
-            voteType === "cap"
-              ? state.cap_count + 1
-              : Math.max(state.cap_count - 1, 0),
-          userVote: voteType,
-        };
-      } else {
-        // New vote
-        return {
-          believe_count:
-            voteType === "believe"
-              ? state.believe_count + 1
-              : state.believe_count,
-          cap_count:
-            voteType === "cap" ? state.cap_count + 1 : state.cap_count,
-          userVote: voteType,
-        };
-      }
-    }
-  );
+  const [believeCount, setBelieveCount] = useState(rumor.believe_count);
+  const [capCount, setCapCount] = useState(rumor.cap_count);
+  const [userVote, setUserVote] = useState<VoteType | null>(null);
+  const [isVoting, setIsVoting] = useState(false);
+  const [showVoteMessage, setShowVoteMessage] = useState(false);
 
-  function handleVote(voteType: VoteType) {
-    startTransition(async () => {
-      setOptimistic(voteType);
+  useEffect(() => {
+    if (!showVoteMessage) return;
+    const timer = setTimeout(() => setShowVoteMessage(false), 2000);
+    return () => clearTimeout(timer);
+  }, [showVoteMessage]);
+
+  async function handleVote(voteType: VoteType) {
+    setIsVoting(true);
+
+    // Optimistic update
+    if (userVote === voteType) {
+      // Toggle off
+      if (voteType === "believe") setBelieveCount((c) => Math.max(c - 1, 0));
+      else setCapCount((c) => Math.max(c - 1, 0));
+      setUserVote(null);
+    } else if (userVote) {
+      // Switch
+      if (voteType === "believe") {
+        setBelieveCount((c) => c + 1);
+        setCapCount((c) => Math.max(c - 1, 0));
+      } else {
+        setCapCount((c) => c + 1);
+        setBelieveCount((c) => Math.max(c - 1, 0));
+      }
+      setUserVote(voteType);
+      setShowVoteMessage(true);
+    } else {
+      // New vote
+      if (voteType === "believe") setBelieveCount((c) => c + 1);
+      else setCapCount((c) => c + 1);
+      setUserVote(voteType);
+      setShowVoteMessage(true);
+    }
+
+    // Try server action if Supabase is configured
+    try {
+      const { castVote } = await import("@/app/rumors/actions");
       await castVote(rumor.id, voteType);
-    });
+    } catch {
+      // Demo mode — vote stays client-side only
+    }
+
+    setIsVoting(false);
   }
 
   const categoryColors: Record<string, string> = {
@@ -86,13 +74,14 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
   };
 
   const timeAgo = getTimeAgo(rumor.created_at);
+  const total = believeCount + capCount;
 
   return (
-    <Card className="overflow-hidden border-border/50 transition-colors hover:border-primary/30">
+    <Card className="group relative overflow-hidden border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 before:absolute before:inset-0 before:rounded-[inherit] before:p-[1px] before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-transparent before:transition-all before:duration-300 hover:before:from-primary/40 hover:before:via-primary/10 hover:before:to-primary/40 before:-z-10">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="secondary"
                 className={categoryColors[rumor.category] ?? categoryColors.other}
@@ -103,6 +92,11 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
                 <span className="text-xs font-medium text-muted-foreground">
                   {rumor.player_name}
                 </span>
+              )}
+              {total > 500 && (
+                <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 text-[10px]">
+                  HOT
+                </Badge>
               )}
             </div>
             {expanded ? (
@@ -128,33 +122,42 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
           </p>
         )}
 
-        <SentimentGauge
-          believeCount={optimistic.believe_count}
-          capCount={optimistic.cap_count}
-        />
+        <SentimentGauge believeCount={believeCount} capCount={capCount} />
 
         <div className="flex gap-2">
           <Button
             size="sm"
-            variant={optimistic.userVote === "believe" ? "default" : "outline"}
-            className="flex-1 gap-1.5"
+            variant={userVote === "believe" ? "default" : "outline"}
+            className={`flex-1 gap-1.5 transition-all duration-200 ${
+              userVote === "believe" ? "scale-[1.02] shadow-md shadow-primary/20" : ""
+            }`}
             onClick={() => handleVote("believe")}
-            disabled={isPending}
+            disabled={isVoting}
           >
+            <span className="text-xs">&#x1F525;</span>
             <span>BELIEVE</span>
-            <span className="text-xs opacity-70">{optimistic.believe_count}</span>
+            <span className="text-xs opacity-70">{believeCount}</span>
           </Button>
           <Button
             size="sm"
-            variant={optimistic.userVote === "cap" ? "secondary" : "outline"}
-            className="flex-1 gap-1.5"
+            variant={userVote === "cap" ? "secondary" : "outline"}
+            className={`flex-1 gap-1.5 transition-all duration-200 ${
+              userVote === "cap" ? "scale-[1.02] shadow-md" : ""
+            }`}
             onClick={() => handleVote("cap")}
-            disabled={isPending}
+            disabled={isVoting}
           >
+            <span className="text-xs">&#x1F9E2;</span>
             <span>CAP</span>
-            <span className="text-xs opacity-70">{optimistic.cap_count}</span>
+            <span className="text-xs opacity-70">{capCount}</span>
           </Button>
         </div>
+
+        {showVoteMessage && (
+          <p className="text-center text-xs font-medium text-primary animate-in fade-in duration-300">
+            Your vote counts!
+          </p>
+        )}
 
         {expanded && rumor.source_url && (
           <a
