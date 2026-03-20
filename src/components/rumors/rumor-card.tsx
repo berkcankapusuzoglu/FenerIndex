@@ -75,6 +75,25 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
   const timeAgo = getTimeAgo(rumor.created_at);
   const total = believeCount + capCount;
+  const believePct = total > 0 ? Math.round((believeCount / total) * 100) : 50;
+
+  function getCredibilityLabel(): { text: string; className: string } | null {
+    if (total < 100) return null;
+    if (believePct >= 90) return { text: "LEGIT", className: "text-green-400" };
+    if (believePct >= 70) return { text: "LIKELY", className: "text-primary" };
+    if (believePct >= 40) return { text: "50/50", className: "text-muted-foreground" };
+    if (believePct >= 20) return { text: "DOUBTFUL", className: "text-orange-400" };
+    return { text: "CAP", className: "text-red-400" };
+  }
+
+  const credibility = getCredibilityLabel();
+
+  const voteMessages = [
+    "Your vote counts!",
+    "The fans have spoken!",
+    "Voice heard!",
+    "Locked in!",
+  ];
 
   return (
     <Card className="group relative overflow-hidden border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 before:absolute before:inset-0 before:rounded-[inherit] before:p-[1px] before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-transparent before:transition-all before:duration-300 hover:before:from-primary/40 hover:before:via-primary/10 hover:before:to-primary/40 before:-z-10">
@@ -97,6 +116,11 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
                 <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 text-[10px]">
                   HOT
                 </Badge>
+              )}
+              {credibility && (
+                <span className={`text-[10px] font-bold tracking-wider ${credibility.className}`}>
+                  {credibility.text}
+                </span>
               )}
             </div>
             {expanded ? (
@@ -155,7 +179,7 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
         {showVoteMessage && (
           <p className="text-center text-xs font-medium text-primary animate-in fade-in duration-300">
-            Your vote counts!
+            {voteMessages[Math.floor(Math.random() * voteMessages.length)]}
           </p>
         )}
 

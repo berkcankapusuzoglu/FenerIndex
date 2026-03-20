@@ -3,7 +3,7 @@ import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
 import type { Rumor } from "@/lib/supabase/types";
 
 export const metadata = {
-  title: "Rumor Radar | FenerIndex",
+  title: "Rumor Radar",
   description: "Vote on the latest Fenerbahce transfer rumors",
 };
 
