@@ -117,41 +117,47 @@ export default function Home() {
                 : 50;
 
             return (
-              <Card key={rumor.id} className="relative transition-shadow hover:shadow-lg hover:shadow-primary/5">
-                <CardHeader>
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                      {i + 1}
-                    </span>
-                    <Badge variant="outline" className="text-[10px] uppercase">
-                      {rumor.category}
-                    </Badge>
-                  </div>
-                  <CardTitle className="line-clamp-2 text-sm leading-snug">
-                    {rumor.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {rumor.player_name && (
-                    <p className="text-xs font-medium text-muted-foreground">
-                      {rumor.player_name}
-                    </p>
-                  )}
+              <Link key={rumor.id} href={`/rumors/${rumor.id}`} className="group">
+                <Card className="relative h-full cursor-pointer border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 hover:scale-[1.02]">
+                  <CardHeader>
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                        {i + 1}
+                      </span>
+                      <Badge variant="outline" className="text-[10px] uppercase">
+                        {rumor.category}
+                      </Badge>
+                    </div>
+                    <CardTitle className="line-clamp-2 text-sm leading-snug transition-colors duration-200 group-hover:text-primary">
+                      {rumor.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {rumor.player_name && (
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {rumor.player_name}
+                      </p>
+                    )}
 
-                  {/* Mini sentiment bar */}
-                  <SentimentGauge
-                    believeCount={rumor.believe_count}
-                    capCount={rumor.cap_count}
-                  />
+                    {/* Mini sentiment bar */}
+                    <SentimentGauge
+                      believeCount={rumor.believe_count}
+                      capCount={rumor.cap_count}
+                    />
 
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span className="font-semibold text-primary">
-                      {believePct}% believe
-                    </span>
-                    <span>{total.toLocaleString()} votes</span>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span className="font-semibold text-primary">
+                        {believePct}% believe
+                      </span>
+                      <span>{total.toLocaleString()} votes</span>
+                    </div>
+
+                    <div className="flex items-center justify-end pt-1 text-xs font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      Vote now &rarr;
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             );
           })}
         </div>

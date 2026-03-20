@@ -24,12 +24,15 @@ export const metadata: Metadata = {
     "Fan-powered transfer intelligence for Fenerbahce. Vote on rumors, call cap on fake news, and see what the hive mind really thinks.",
   keywords: [
     "Fenerbahce",
+    "Fenerbahce transfer",
     "transfer rumors",
     "fan voting",
     "Super Lig",
     "football",
     "soccer",
     "sentiment",
+    "Fenerbahce haberleri",
+    "transfer dedikodu",
   ],
   openGraph: {
     title: "FenerIndex - The Pulse of Fenerbahce Fans",
@@ -38,13 +41,16 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "FenerIndex",
     locale: "en_US",
+    url: "https://fenerindex.vercel.app",
   },
   twitter: {
     card: "summary_large_image",
     title: "FenerIndex - The Pulse of Fenerbahce Fans",
     description:
       "Fan-powered transfer intelligence. Vote on rumors, expose fakes, shape the narrative.",
+    creator: "@FenerIndex",
   },
+  metadataBase: new URL("https://fenerindex.vercel.app"),
   robots: {
     index: true,
     follow: true,

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RumorCard } from "@/components/rumors/rumor-card";
 import { ShareButton } from "@/components/rumors/share-button";
@@ -50,9 +51,38 @@ export default async function RumorDetailPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
+      <Link
+        href="/rumors"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M19 12H5" />
+          <path d="m12 19-7-7 7-7" />
+        </svg>
+        Back to rumors
+      </Link>
+
       <RumorCard rumor={rumor} expanded />
-      <div className="mt-4 flex justify-center">
-        <ShareButton rumor={rumor} />
+
+      <div className="mt-8 rounded-lg border border-border/50 bg-card/50 px-6 py-5 text-center">
+        <p className="text-sm font-medium text-foreground">
+          Think your friends would agree? Share this rumor!
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Spread the word and see if others believe it too.
+        </p>
+        <div className="mt-4 flex justify-center">
+          <ShareButton rumor={rumor} />
+        </div>
       </div>
     </div>
   );
