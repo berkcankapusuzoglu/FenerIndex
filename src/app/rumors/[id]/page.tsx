@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props) {
   const pct = total > 0 ? Math.round((rumor.believe_count / total) * 100) : 50;
 
   return {
-    title: `${rumor.title} | FenerIndex`,
+    title: rumor.title,
     description: `${pct}% of fans believe this rumor. Cast your vote!`,
     openGraph: {
       title: rumor.title,
