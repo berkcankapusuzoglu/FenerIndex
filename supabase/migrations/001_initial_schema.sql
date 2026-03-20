@@ -140,6 +140,11 @@ alter table player_ratings enable row level security;
 create policy "Public read rumors"   on rumors     for select using (true);
 create policy "Public read hot_takes" on hot_takes for select using (true);
 
+-- Admin operations on rumors (insert/update/delete allowed for service role via security definer functions)
+create policy "Allow insert rumors"  on rumors for insert with check (true);
+create policy "Allow update rumors"  on rumors for update using (true);
+create policy "Allow delete rumors"  on rumors for delete using (true);
+
 -- Authenticated voting (using user_id text for anonymous session IDs too)
 create policy "Anyone can insert vote" on votes for insert with check (true);
 create policy "Read own votes"         on votes for select using (true);
