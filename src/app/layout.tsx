@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  verification: {
+    google: "6hM7PK-SEjlTApiHSnVcVt62q1F2-dPMqT0UqgBlCRc",
+  },
   title: {
     default: "FenerIndex - The Pulse of Fenerbahce Fans",
     template: "%s | FenerIndex",
