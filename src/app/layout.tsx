@@ -64,6 +64,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "FenerIndex",
+    url: "https://fenerindex.vercel.app",
+    description:
+      "Fan-powered transfer intelligence for Fenerbahce. Vote on rumors, call cap on fake news, and see what the hive mind really thinks.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://fenerindex.vercel.app/rumors",
+    },
+  };
+
   return (
     <html
       lang="en"
@@ -71,6 +84,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ThemeProvider>
           <Header />
           <main className="flex-1">{children}</main>

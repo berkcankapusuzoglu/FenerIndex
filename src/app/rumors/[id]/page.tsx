@@ -49,8 +49,42 @@ export default async function RumorDetailPage({ params }: Props) {
 
   if (!rumor) notFound();
 
+  const total = rumor.believe_count + rumor.cap_count;
+  const believePct = total > 0 ? Math.round((rumor.believe_count / total) * 100) : 50;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    headline: rumor.title,
+    text: rumor.description ?? rumor.title,
+    datePublished: rumor.created_at,
+    author: { "@type": "Organization", name: "FenerIndex" },
+    url: `https://fenerindex.vercel.app/rumors/${rumor.id}`,
+    interactionStatistic: [
+      {
+        "@type": "InteractionCounter",
+        interactionType: "https://schema.org/LikeAction",
+        userInteractionCount: rumor.believe_count,
+      },
+      {
+        "@type": "InteractionCounter",
+        interactionType: "https://schema.org/DislikeAction",
+        userInteractionCount: rumor.cap_count,
+      },
+    ],
+    about: {
+      "@type": "SportsTeam",
+      name: "Fenerbahce SK",
+    },
+    keywords: `Fenerbahce, ${rumor.category}, ${rumor.player_name ?? "transfer"}, ${believePct}% believe`,
+  };
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href="/rumors"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"

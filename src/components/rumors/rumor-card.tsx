@@ -22,7 +22,7 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
   useEffect(() => {
     if (!showVoteMessage) return;
-    const timer = setTimeout(() => setShowVoteMessage(false), 2000);
+    const timer = setTimeout(() => setShowVoteMessage(false), 3000);
     return () => clearTimeout(timer);
   }, [showVoteMessage]);
 
@@ -31,12 +31,10 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
     // Optimistic update
     if (userVote === voteType) {
-      // Toggle off
       if (voteType === "believe") setBelieveCount((c) => Math.max(c - 1, 0));
       else setCapCount((c) => Math.max(c - 1, 0));
       setUserVote(null);
     } else if (userVote) {
-      // Switch
       if (voteType === "believe") {
         setBelieveCount((c) => c + 1);
         setCapCount((c) => Math.max(c - 1, 0));
@@ -47,14 +45,12 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
       setUserVote(voteType);
       setShowVoteMessage(true);
     } else {
-      // New vote
       if (voteType === "believe") setBelieveCount((c) => c + 1);
       else setCapCount((c) => c + 1);
       setUserVote(voteType);
       setShowVoteMessage(true);
     }
 
-    // Try server action if Supabase is configured
     try {
       const { castVote } = await import("@/app/rumors/actions");
       await castVote(rumor.id, voteType);
@@ -76,9 +72,10 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
   const timeAgo = getTimeAgo(rumor.created_at);
   const total = believeCount + capCount;
   const believePct = total > 0 ? Math.round((believeCount / total) * 100) : 50;
+  const hasVoted = userVote !== null;
 
   function getCredibilityLabel(): { text: string; className: string } | null {
-    if (total < 100) return null;
+    if (total < 100 || !hasVoted) return null;
     if (believePct >= 90) return { text: "LEGIT", className: "text-green-400" };
     if (believePct >= 70) return { text: "LIKELY", className: "text-primary" };
     if (believePct >= 40) return { text: "50/50", className: "text-muted-foreground" };
@@ -88,12 +85,12 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
   const credibility = getCredibilityLabel();
 
-  const voteMessages = [
-    "Your vote counts!",
-    "The fans have spoken!",
-    "Voice heard!",
-    "Locked in!",
-  ];
+  function handleShareAfterVote() {
+    const url = typeof window !== "undefined" ? `${window.location.origin}/rumors/${rumor.id}` : "";
+    const text = `${believePct}% of fans BELIEVE: "${rumor.title}" - What do you think?`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, "_blank", "noopener,noreferrer,width=600,height=400");
+  }
 
   return (
     <Card className="group relative overflow-hidden border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 before:absolute before:inset-0 before:rounded-[inherit] before:p-[1px] before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-transparent before:transition-all before:duration-300 hover:before:from-primary/40 hover:before:via-primary/10 hover:before:to-primary/40 before:-z-10">
@@ -146,7 +143,24 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
           </p>
         )}
 
-        <SentimentGauge believeCount={believeCount} capCount={capCount} />
+        {/* Results reveal: show gauge with percentages only after voting */}
+        {hasVoted ? (
+          <SentimentGauge believeCount={believeCount} capCount={capCount} />
+        ) : (
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs font-medium">
+              <span className="text-primary">BELIEVE</span>
+              <span className="text-muted-foreground">
+                Vote to see results
+              </span>
+              <span className="text-secondary-foreground opacity-70">CAP</span>
+            </div>
+            <div className="flex h-2.5 overflow-hidden rounded-full bg-muted">
+              <div className="w-1/2 rounded-l-full bg-primary/30" />
+              <div className="w-1/2 rounded-r-full bg-fb-navy-light/30" />
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-2">
           <Button
@@ -160,7 +174,7 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
           >
             <span className="text-xs">&#x1F525;</span>
             <span>BELIEVE</span>
-            <span className="text-xs opacity-70">{believeCount}</span>
+            {hasVoted && <span className="text-xs opacity-70">{believeCount}</span>}
           </Button>
           <Button
             size="sm"
@@ -173,14 +187,23 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
           >
             <span className="text-xs">&#x1F9E2;</span>
             <span>CAP</span>
-            <span className="text-xs opacity-70">{capCount}</span>
+            {hasVoted && <span className="text-xs opacity-70">{capCount}</span>}
           </Button>
         </div>
 
+        {/* Post-vote share CTA */}
         {showVoteMessage && (
-          <p className="text-center text-xs font-medium text-primary animate-in fade-in duration-300">
-            {voteMessages[Math.floor(Math.random() * voteMessages.length)]}
-          </p>
+          <div className="flex items-center justify-between rounded-lg bg-primary/10 px-3 py-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <span className="text-xs font-medium text-primary">
+              {believePct}% of fans agree with you!
+            </span>
+            <button
+              onClick={handleShareAfterVote}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              Share on X
+            </button>
+          </div>
         )}
 
         {expanded && rumor.source_url && (
