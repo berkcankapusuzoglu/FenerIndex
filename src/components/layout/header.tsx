@@ -26,6 +26,12 @@ export function Header() {
           >
             Hot Takes
           </Link>
+          <Link
+            href="/news"
+            className="rounded-md px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            News
+          </Link>
         </nav>
       </div>
     </header>

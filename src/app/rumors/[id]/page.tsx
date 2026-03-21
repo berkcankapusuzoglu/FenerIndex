@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RumorCard } from "@/components/rumors/rumor-card";
 import { ShareButton } from "@/components/rumors/share-button";
+import { AdUnit } from "@/components/ads/ad-unit";
+import { AD_SLOTS } from "@/components/ads/ad-config";
 import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
 import type { Rumor } from "@/lib/supabase/types";
 
@@ -106,6 +108,12 @@ export default async function RumorDetailPage({ params }: Props) {
       </Link>
 
       <RumorCard rumor={rumor} expanded />
+
+      <AdUnit
+        slot={AD_SLOTS.ARTICLE_BOTTOM}
+        format="auto"
+        className="mt-8"
+      />
 
       <div className="mt-8 rounded-lg border border-border/50 bg-card/50 px-6 py-5 text-center">
         <p className="text-sm font-medium text-foreground">

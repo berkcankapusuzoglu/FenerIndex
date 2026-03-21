@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
 import { DEMO_HOT_TAKES } from "@/lib/demo-hot-takes";
+import { DEMO_NEWS } from "@/lib/demo-news";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SentimentGauge } from "@/components/rumors/sentiment-gauge";
+import { AdUnit } from "@/components/ads/ad-unit";
+import { AD_SLOTS } from "@/components/ads/ad-config";
 import type { Rumor } from "@/lib/supabase/types";
 
 async function getRumors(): Promise<Rumor[]> {
@@ -191,6 +194,13 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Ad between sections */}
+      <AdUnit
+        slot={AD_SLOTS.HEADER_BANNER}
+        format="auto"
+        className="mx-auto max-w-5xl px-4"
+      />
+
       {/* Hot Takes Preview */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
         <div className="mb-8 flex items-end justify-between">
@@ -245,6 +255,62 @@ export default async function Home() {
             className="text-sm font-medium text-primary hover:underline"
           >
             View all takes &rarr;
+          </Link>
+        </div>
+      </section>
+
+      {/* Latest News Preview */}
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Latest Analysis
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              In-depth breakdowns of the biggest rumors
+            </p>
+          </div>
+          <Link
+            href="/news"
+            className="hidden text-sm font-medium text-primary hover:underline sm:block"
+          >
+            View all articles &rarr;
+          </Link>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {DEMO_NEWS.slice(0, 3).map((article) => (
+            <Link key={article.id} href={`/news/${article.slug}`} className="group">
+              <Card className="h-full border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
+                <CardHeader>
+                  <div className="mb-1 flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] uppercase">
+                      {article.category}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground">
+                      {article.readingTime} min read
+                    </span>
+                  </div>
+                  <CardTitle className="line-clamp-2 text-sm leading-snug transition-colors duration-200 group-hover:text-primary">
+                    {article.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="line-clamp-3 text-xs text-muted-foreground leading-relaxed">
+                    {article.excerpt}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-6 text-center sm:hidden">
+          <Link
+            href="/news"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            View all articles &rarr;
           </Link>
         </div>
       </section>

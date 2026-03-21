@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
+import { DEMO_NEWS } from "@/lib/demo-news";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://fenerindex.vercel.app";
@@ -8,6 +9,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${baseUrl}/rumors`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.9 },
     { url: `${baseUrl}/hot-takes`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.8 },
+    { url: `${baseUrl}/news`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
+    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.2 },
   ];
 
   let rumorRoutes: MetadataRoute.Sitemap = [];
@@ -40,5 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...rumorRoutes];
+  const newsRoutes: MetadataRoute.Sitemap = DEMO_NEWS.map((article) => ({
+    url: `${baseUrl}/news/${article.slug}`,
+    lastModified: new Date(article.publishedAt),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...rumorRoutes, ...newsRoutes];
 }

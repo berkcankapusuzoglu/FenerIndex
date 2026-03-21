@@ -21,6 +21,8 @@ No test framework is configured.
 NEXT_PUBLIC_SUPABASE_URL=<project_url>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
 ADMIN_PASSWORD=<your_admin_password>
+NEXT_PUBLIC_ADSENSE_PUB_ID=<ca-pub-xxxxx>  # Google AdSense publisher ID (optional — ads hidden when unset)
+NEXT_PUBLIC_BMC_USERNAME=<username>          # Buy Me a Coffee username (optional)
 ```
 
 When Supabase vars are missing or contain placeholder values, the app runs in **demo mode** — all data comes from `src/lib/demo-data.ts` and votes are client-side only. The `isDemoMode()` function in that file is the single source of truth for this check.
@@ -39,6 +41,10 @@ When Supabase vars are missing or contain placeholder values, the app runs in **
 - `/rumors` — Rumor Radar with voting, filters, sort, realtime updates
 - `/rumors/[id]` — Individual rumor detail with full voting UI and share buttons
 - `/hot-takes` — Hot Takes with agree/disagree voting, category filters, sort
+- `/news` — News & Analysis blog with rich articles (solves AdSense "thin content")
+- `/news/[slug]` — Individual article with related rumor link
+- `/about` — About page explaining FenerIndex
+- `/privacy` — Privacy policy (required for AdSense compliance)
 - `/admin` — Admin panel with CRUD for rumors (protected by `ADMIN_PASSWORD`)
 
 ### Data Flow
@@ -48,7 +54,7 @@ When Supabase vars are missing or contain placeholder values, the app runs in **
 - **Server Action** (`src/app/rumors/actions.ts`) — `castVote()` persists votes to Supabase via RPC, uses cookie-based anonymous user ID (`fener_uid`), with input validation and rate limiting (15 votes/min per user)
 - **Admin Actions** (`src/app/admin/actions.ts`) — `loginAdmin`, `logoutAdmin`, `addRumor`, `updateRumor`, `deleteRumor`, `updateRumorStatus`
 - **Realtime** — `rumor-list.tsx` subscribes to Supabase `postgres_changes` on the `rumors` table for live vote count updates (skipped in demo mode)
-- **Demo data** — `src/lib/demo-data.ts` (10 rumors) and `src/lib/demo-hot-takes.ts` (10 hot takes)
+- **Demo data** — `src/lib/demo-data.ts` (10 rumors), `src/lib/demo-hot-takes.ts` (10 hot takes), `src/lib/demo-news.ts` (10 articles)
 
 ### Error Handling
 
@@ -90,6 +96,12 @@ All use `next/og` `ImageResponse` with Satori. Renderers use **inline flex style
 - Rate limiting on `castVote` server action (in-memory, 15 votes/min per user)
 - Input validation on all server actions
 - RLS policies tightened: rumors table read-only for anonymous users, writes via `security definer` functions or service role only
+
+### Monetization
+
+- **Google AdSense**: `src/components/ads/ad-config.ts` + `src/components/ads/ad-unit.tsx` — reusable `<AdUnit>` component, auto-hidden when `NEXT_PUBLIC_ADSENSE_PUB_ID` is unset. Ads placed: rumor feed (every 4th card), rumor detail, hot takes bottom, landing page between sections.
+- **Buy Me a Coffee**: `src/components/support/buy-me-coffee.tsx` — tip jar widget in footer, configurable via `NEXT_PUBLIC_BMC_USERNAME`
+- **Content for AdSense approval**: `/news` blog with 10 rich 300-500 word articles, `/about`, `/privacy` pages add substantial text content
 
 ### Theming
 

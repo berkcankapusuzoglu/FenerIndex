@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RumorCard } from "./rumor-card";
+import { AdUnit } from "@/components/ads/ad-unit";
+import { AD_SLOTS } from "@/components/ads/ad-config";
 import { Badge } from "@/components/ui/badge";
 import type { Rumor } from "@/lib/supabase/types";
 
@@ -160,8 +162,17 @@ export function RumorList({ initialRumors }: RumorListProps) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {sorted.map((rumor) => (
-          <RumorCard key={rumor.id} rumor={rumor} />
+        {sorted.map((rumor, index) => (
+          <React.Fragment key={rumor.id}>
+            <RumorCard rumor={rumor} />
+            {(index + 1) % 4 === 0 && (
+              <AdUnit
+                slot={AD_SLOTS.RUMORS_FEED_INLINE}
+                format="fluid"
+                className="sm:col-span-2"
+              />
+            )}
+          </React.Fragment>
         ))}
       </div>
 

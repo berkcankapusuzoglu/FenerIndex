@@ -1,4 +1,6 @@
 import { HotTakeList } from "@/components/hot-takes/hot-take-list";
+import { AdUnit } from "@/components/ads/ad-unit";
+import { AD_SLOTS } from "@/components/ads/ad-config";
 import { DEMO_HOT_TAKES } from "@/lib/demo-hot-takes";
 import { isDemoMode } from "@/lib/demo-data";
 import type { HotTake } from "@/lib/supabase/types";
@@ -35,6 +37,11 @@ export default async function HotTakesPage() {
         </p>
       </div>
       <HotTakeList initialHotTakes={hotTakes} />
+      <AdUnit
+        slot={AD_SLOTS.ARTICLE_BOTTOM}
+        format="auto"
+        className="mt-8"
+      />
     </div>
   );
 }
