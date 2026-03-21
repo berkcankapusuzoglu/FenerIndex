@@ -20,12 +20,12 @@ export function Header() {
           >
             Rumor Radar
           </Link>
-          <span className="cursor-not-allowed rounded-md px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
+          <Link
+            href="/hot-takes"
+            className="rounded-md px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
             Hot Takes
-            <span className="ml-1 rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-              SOON
-            </span>
-          </span>
+          </Link>
         </nav>
       </div>
     </header>

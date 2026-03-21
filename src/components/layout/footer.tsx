@@ -10,6 +10,12 @@ export function Footer() {
             <span className="text-sm font-medium">FenerIndex</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <a href="/rumors" className="hover:text-primary transition-colors">
+              Rumors
+            </a>
+            <a href="/hot-takes" className="hover:text-primary transition-colors">
+              Hot Takes
+            </a>
             <a
               href="https://twitter.com/intent/tweet?text=Check%20out%20FenerIndex%20-%20vote%20on%20Fenerbahce%20transfer%20rumors!&url=https://fenerindex.vercel.app"
               target="_blank"
@@ -17,14 +23,6 @@ export function Footer() {
               className="hover:text-primary transition-colors"
             >
               Share on X
-            </a>
-            <a
-              href="https://github.com/berkcankapusuzoglu/FenerIndex"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-primary transition-colors"
-            >
-              GitHub
             </a>
           </div>
         </div>

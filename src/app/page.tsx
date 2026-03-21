@@ -1,11 +1,30 @@
 import Link from "next/link";
-import { DEMO_RUMORS } from "@/lib/demo-data";
+import { DEMO_RUMORS, isDemoMode } from "@/lib/demo-data";
+import { DEMO_HOT_TAKES } from "@/lib/demo-hot-takes";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SentimentGauge } from "@/components/rumors/sentiment-gauge";
+import type { Rumor } from "@/lib/supabase/types";
 
-export default function Home() {
-  const rumors = DEMO_RUMORS;
+async function getRumors(): Promise<Rumor[]> {
+  if (isDemoMode()) return DEMO_RUMORS;
+
+  try {
+    const { getSupabaseServerClient } = await import("@/lib/supabase/server");
+    const supabase = await getSupabaseServerClient();
+    const { data } = await supabase
+      .from("rumors")
+      .select("*")
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
+    return (data as Rumor[]) ?? DEMO_RUMORS;
+  } catch {
+    return DEMO_RUMORS;
+  }
+}
+
+export default async function Home() {
+  const rumors = await getRumors();
   const activeRumors = rumors.filter((r) => r.status === "active");
   const totalVotes = rumors.reduce(
     (sum, r) => sum + r.believe_count + r.cap_count,
@@ -172,6 +191,64 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Hot Takes Preview */}
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Hot Takes
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Spicy opinions — do you agree?
+            </p>
+          </div>
+          <Link
+            href="/hot-takes"
+            className="hidden text-sm font-medium text-primary hover:underline sm:block"
+          >
+            View all takes &rarr;
+          </Link>
+        </div>
+
+        <div className="grid gap-3">
+          {DEMO_HOT_TAKES.slice(0, 3).map((take) => {
+            const total = take.agree_count + take.disagree_count;
+            const agreePct = total > 0 ? Math.round((take.agree_count / total) * 100) : 50;
+
+            return (
+              <Link key={take.id} href="/hot-takes" className="group">
+                <Card className="border-border/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+                  <CardContent className="flex items-center gap-4 p-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium leading-snug truncate group-hover:text-primary transition-colors">
+                        &ldquo;{take.statement}&rdquo;
+                      </p>
+                      <div className="mt-2 flex h-2 rounded-full overflow-hidden bg-muted/50">
+                        <div className="bg-green-500 transition-all" style={{ width: `${agreePct}%` }} />
+                        <div className="bg-red-500/60 transition-all" style={{ width: `${100 - agreePct}%` }} />
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="text-sm font-bold text-green-400">{agreePct}%</div>
+                      <div className="text-[10px] text-muted-foreground">{total.toLocaleString()} votes</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 text-center sm:hidden">
+          <Link
+            href="/hot-takes"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            View all takes &rarr;
+          </Link>
+        </div>
+      </section>
+
       {/* Bottom CTA */}
       <section className="border-t border-border/30">
         <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:py-20">
@@ -181,26 +258,18 @@ export default function Home() {
           <p className="mt-2 text-sm text-muted-foreground">
             Join thousands of Fenerbahce fans making their voices heard.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/rumors"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 active:translate-y-px"
+            >
+              Vote on Rumors
+            </Link>
+            <Link
+              href="/hot-takes"
               className="inline-flex items-center gap-2 rounded-xl bg-secondary px-6 py-3 text-sm font-bold text-secondary-foreground transition-all hover:bg-secondary/80 active:translate-y-px"
             >
-              Start Voting Now
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
+              Drop Hot Takes
             </Link>
           </div>
         </div>

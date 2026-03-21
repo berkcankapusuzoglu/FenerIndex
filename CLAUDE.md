@@ -33,12 +33,21 @@ When Supabase vars are missing or contain placeholder values, the app runs in **
 
 **Deployed at**: https://fenerindex.vercel.app
 
+### Pages
+
+- `/` — Landing page with trending rumors, hot takes preview, stats
+- `/rumors` — Rumor Radar with voting, filters, sort, realtime updates
+- `/rumors/[id]` — Individual rumor detail with full voting UI and share buttons
+- `/hot-takes` — Hot Takes with agree/disagree voting, filters, sort
+- `/admin` — Admin panel with CRUD for rumors (protected by `ADMIN_PASSWORD`)
+
 ### Data Flow
 
-- **Server Components** (`src/app/rumors/page.tsx`, `src/app/rumors/[id]/page.tsx`) fetch data from Supabase or fall back to demo data
-- **Client Components** (`src/components/rumors/rumor-card.tsx`) handle voting with optimistic updates via `useState`
+- **Server Components** (`src/app/rumors/page.tsx`, `src/app/rumors/[id]/page.tsx`, `src/app/hot-takes/page.tsx`) fetch data from Supabase or fall back to demo data
+- **Client Components** (`src/components/rumors/rumor-card.tsx`, `src/components/hot-takes/hot-take-card.tsx`) handle voting with optimistic updates via `useState`
 - **Server Action** (`src/app/rumors/actions.ts`) — `castVote()` persists votes to Supabase via RPC, uses cookie-based anonymous user ID (`fener_uid`)
 - **Realtime** — `rumor-list.tsx` subscribes to Supabase `postgres_changes` on the `rumors` table for live vote count updates (skipped in demo mode)
+- **Demo data** — `src/lib/demo-data.ts` (10 rumors) and `src/lib/demo-hot-takes.ts` (10 hot takes)
 
 ### Supabase Integration
 
@@ -50,11 +59,19 @@ When Supabase vars are missing or contain placeholder values, the app runs in **
 
 ### OG Image Generation
 
-Two paths generate the same share card image using `src/lib/share-card-renderer.tsx`:
-- `src/app/rumors/[id]/opengraph-image.tsx` — auto-attached to rumor detail pages
-- `src/app/api/share-card/route.ts` — programmatic access via `?rumorId=xxx`
+- `src/app/opengraph-image.tsx` — Site-wide OG image (FenerIndex branding)
+- `src/app/rumors/[id]/opengraph-image.tsx` — Per-rumor OG image with vote stats
+- `src/app/api/share-card/route.ts` — Programmatic share card via `?rumorId=xxx`
+- Shared renderer: `src/lib/share-card-renderer.tsx`
 
-Both use `next/og` `ImageResponse` with Satori. The renderer uses **inline flex styles only** (no CSS classes — Satori limitation).
+All use `next/og` `ImageResponse` with Satori. Renderers use **inline flex styles only** (no CSS classes — Satori limitation).
+
+### SEO & PWA
+
+- `src/app/sitemap.ts` — Dynamic sitemap with all routes + individual rumors
+- `src/app/robots.ts` — Blocks `/admin` and `/api/` from crawlers
+- `src/app/manifest.ts` — PWA manifest for "add to home screen"
+- `src/app/icon.tsx` + `src/app/apple-icon.tsx` — Dynamic favicon and Apple touch icon
 
 ### Theming
 

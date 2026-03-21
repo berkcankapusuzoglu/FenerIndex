@@ -160,7 +160,7 @@ export function renderShareCard(rumor: Rumor) {
             marginTop: "4px",
           }}
         >
-          Cast your vote at fenerindex.com
+          Cast your vote at fenerindex.vercel.app
         </div>
       </div>
     </div>
