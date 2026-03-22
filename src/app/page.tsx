@@ -4,7 +4,6 @@ import { DEMO_HOT_TAKES } from "@/lib/demo-hot-takes";
 import { DEMO_NEWS } from "@/lib/demo-news";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SentimentGauge } from "@/components/rumors/sentiment-gauge";
 import { AdUnit } from "@/components/ads/ad-unit";
 import { AD_SLOTS } from "@/components/ads/ad-config";
 import type { Rumor } from "@/lib/supabase/types";
@@ -157,11 +156,11 @@ export default async function Home() {
                       </p>
                     )}
 
-                    {/* Mini sentiment bar */}
-                    <SentimentGauge
-                      believeCount={rumor.believe_count}
-                      capCount={rumor.cap_count}
-                    />
+                    {/* Neutral bar — no percentages revealed */}
+                    <div className="flex h-2.5 overflow-hidden rounded-full bg-muted">
+                      <div className="w-1/2 rounded-l-full bg-primary/30" />
+                      <div className="w-1/2 rounded-r-full bg-fb-navy-light/30" />
+                    </div>
 
                     <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                       <span className="font-semibold text-orange-400">
