@@ -32,7 +32,7 @@ export function AdUnit({ slot, format = "auto", className }: AdUnitProps) {
   if (!isAdsEnabled()) return null;
 
   return (
-    <div className={className}>
+    <div className={`min-h-[90px] ${className ?? ""}`}>
       <p className="mb-1 text-center text-xs text-muted-foreground">
         Advertisement
       </p>

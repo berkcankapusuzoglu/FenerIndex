@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BuyMeCoffee } from "@/components/support/buy-me-coffee";
 
 export function Footer() {
@@ -13,23 +14,23 @@ export function Footer() {
           </div>
           <div className="flex flex-col items-center sm:items-end gap-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
-              <a href="/rumors" className="hover:text-primary transition-colors">
+              <Link href="/rumors" className="hover:text-primary transition-colors">
                 Rumors
-              </a>
-              <a href="/hot-takes" className="hover:text-primary transition-colors">
+              </Link>
+              <Link href="/hot-takes" className="hover:text-primary transition-colors">
                 Hot Takes
-              </a>
-              <a href="/news" className="hover:text-primary transition-colors">
+              </Link>
+              <Link href="/news" className="hover:text-primary transition-colors">
                 News
-              </a>
-              <a href="/about" className="hover:text-primary transition-colors">
+              </Link>
+              <Link href="/about" className="hover:text-primary transition-colors">
                 About
-              </a>
+              </Link>
             </div>
             <div className="flex items-center gap-4">
-              <a href="/privacy" className="hover:text-primary transition-colors">
+              <Link href="/privacy" className="hover:text-primary transition-colors">
                 Privacy
-              </a>
+              </Link>
               <a
                 href="https://twitter.com/intent/tweet?text=Check%20out%20FenerIndex%20-%20vote%20on%20Fenerbahce%20transfer%20rumors!&url=https://fenerindex.vercel.app"
                 target="_blank"

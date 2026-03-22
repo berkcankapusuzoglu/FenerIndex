@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AdUnit } from "@/components/ads/ad-unit";
+import { AD_SLOTS } from "@/components/ads/ad-config";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -31,9 +33,33 @@ export default async function NewsArticlePage({ params }: Props) {
 
   const relatedRumor = DEMO_RUMORS.find((r) => r.id === article.rumorId);
   const paragraphs = article.content.split("\n\n");
+  const shareUrl = `https://fenerindex.vercel.app/news/${article.slug}`;
+  const xShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(shareUrl)}`;
+  const waShareUrl = `https://wa.me/?text=${encodeURIComponent(article.title + " " + shareUrl)}`;
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.excerpt,
+    author: {
+      "@type": "Person",
+      name: article.author,
+    },
+    datePublished: article.publishedAt,
+    publisher: {
+      "@type": "Organization",
+      name: "FenerIndex",
+      url: "https://fenerindex.vercel.app",
+    },
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <Link
         href="/news"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
@@ -75,6 +101,24 @@ export default async function NewsArticlePage({ params }: Props) {
             <span>·</span>
             <span>{article.readingTime} min read</span>
           </div>
+          <div className="mt-3 flex items-center gap-3">
+            <a
+              href={xShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-md bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary/20 hover:text-primary"
+            >
+              Share on X
+            </a>
+            <a
+              href={waShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-md bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-green-500/20 hover:text-green-400"
+            >
+              WhatsApp
+            </a>
+          </div>
         </header>
 
         <div className="space-y-4 text-[15px] leading-relaxed text-foreground/90">
@@ -83,6 +127,8 @@ export default async function NewsArticlePage({ params }: Props) {
           ))}
         </div>
       </article>
+
+      <AdUnit slot={AD_SLOTS.ARTICLE_BOTTOM} format="auto" className="mt-10" />
 
       {relatedRumor && (
         <Card className="mt-10 border-primary/30">

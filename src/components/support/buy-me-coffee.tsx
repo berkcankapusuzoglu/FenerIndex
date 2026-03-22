@@ -1,6 +1,6 @@
 "use client";
 
-const BMC_USERNAME = process.env.NEXT_PUBLIC_BMC_USERNAME ?? "fenerindex";
+const BMC_USERNAME = process.env.NEXT_PUBLIC_BMC_USERNAME || "";
 
 interface BuyMeCoffeeProps {
   variant?: "inline" | "button";

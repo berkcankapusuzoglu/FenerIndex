@@ -22,7 +22,7 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
   useEffect(() => {
     if (!showVoteMessage) return;
-    const timer = setTimeout(() => setShowVoteMessage(false), 3000);
+    const timer = setTimeout(() => setShowVoteMessage(false), 8000);
     return () => clearTimeout(timer);
   }, [showVoteMessage]);
 
@@ -85,11 +85,26 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
 
   const credibility = getCredibilityLabel();
 
-  function handleShareAfterVote() {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/rumors/${rumor.id}` : "";
-    const text = `${believePct}% of fans BELIEVE: "${rumor.title}" - What do you think?`;
+  function getShareUrl() {
+    return typeof window !== "undefined" ? `${window.location.origin}/rumors/${rumor.id}` : "";
+  }
+
+  function getShareText() {
+    return `${believePct}% of fans BELIEVE: "${rumor.title}" - What do you think?`;
+  }
+
+  function handleShareX() {
+    const url = getShareUrl();
+    const text = getShareText();
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, "_blank", "noopener,noreferrer,width=600,height=400");
+  }
+
+  function handleShareWhatsApp() {
+    const url = getShareUrl();
+    const text = getShareText();
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -197,12 +212,20 @@ export function RumorCard({ rumor, expanded = false }: RumorCardProps) {
             <span className="text-xs font-medium text-primary">
               {believePct}% of fans agree with you!
             </span>
-            <button
-              onClick={handleShareAfterVote}
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              Share on X
-            </button>
+            <span className="flex items-center gap-2">
+              <button
+                onClick={handleShareX}
+                className="text-xs font-semibold text-primary hover:underline"
+              >
+                Share on X
+              </button>
+              <button
+                onClick={handleShareWhatsApp}
+                className="text-xs font-semibold text-green-400 hover:underline"
+              >
+                WhatsApp
+              </button>
+            </span>
           </div>
         )}
 

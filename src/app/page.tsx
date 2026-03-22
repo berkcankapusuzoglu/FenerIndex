@@ -133,10 +133,6 @@ export default async function Home() {
         <div className="grid gap-4 sm:grid-cols-3">
           {topRumors.map((rumor, i) => {
             const total = rumor.believe_count + rumor.cap_count;
-            const believePct =
-              total > 0
-                ? Math.round((rumor.believe_count / total) * 100)
-                : 50;
 
             return (
               <Link key={rumor.id} href={`/rumors/${rumor.id}`} className="group">
@@ -168,10 +164,10 @@ export default async function Home() {
                     />
 
                     <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span className="font-semibold text-primary">
-                        {believePct}% believe
+                      <span className="font-semibold text-orange-400">
+                        &#x1F525; {total.toLocaleString()} votes
                       </span>
-                      <span>{total.toLocaleString()} votes</span>
+                      <span>Vote to see results</span>
                     </div>
 
                     <div className="flex items-center justify-end pt-1 text-xs font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">

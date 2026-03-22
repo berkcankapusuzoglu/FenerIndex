@@ -24,7 +24,7 @@ export default function AboutPage() {
         <h2 className="text-xl font-semibold">How It Works</h2>
         <p className="text-muted-foreground leading-relaxed">
           When a transfer rumor surfaces, it gets added to the <strong>Rumor Radar</strong>.
-          Every fan can cast a vote — Believe, Doubt, or call it outright Cap. Once you
+          Every fan can cast a vote — Believe or call it outright Cap. Once you
           vote, the community breakdown is revealed so you can see where the fanbase stands.
           Each rumor earns a credibility label ranging from LEGIT to CAP based on the
           collective vote, giving you an instant read on how seriously the community takes

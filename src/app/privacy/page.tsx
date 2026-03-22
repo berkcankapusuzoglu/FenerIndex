@@ -125,7 +125,14 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Contact</h2>
         <p className="text-muted-foreground leading-relaxed">
-          For privacy-related questions or concerns, reach out via{" "}
+          For privacy-related questions or concerns, email us at{" "}
+          <a
+            href="mailto:privacy@fenerindex.com"
+            className="text-primary hover:underline"
+          >
+            privacy@fenerindex.com
+          </a>{" "}
+          or reach out via{" "}
           <a
             href="https://twitter.com/fenerindex"
             target="_blank"

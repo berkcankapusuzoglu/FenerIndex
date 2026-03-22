@@ -76,10 +76,6 @@ export default function RootLayout({
     url: "https://fenerindex.vercel.app",
     description:
       "Fan-powered transfer intelligence for Fenerbahce. Vote on rumors, call cap on fake news, and see what the hive mind really thinks.",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://fenerindex.vercel.app/rumors",
-    },
   };
 
   return (
